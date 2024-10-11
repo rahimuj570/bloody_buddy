@@ -129,4 +129,24 @@
     <servlet-name>SeenChatRoomServlet</servlet-name>
     <url-pattern>/SeenChatRoomServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>UpdateProfileDetailServlet</display-name>
+    <servlet-name>UpdateProfileDetailServlet</servlet-name>
+    <servlet-class>servlets.UpdateProfileDetailServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UpdateProfileDetailServlet</servlet-name>
+    <url-pattern>/UpdateProfileDetailServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>UpdateStatusServlet</display-name>
+    <servlet-name>UpdateStatusServlet</servlet-name>
+    <servlet-class>servlets.UpdateStatusServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UpdateStatusServlet</servlet-name>
+    <url-pattern>/UpdateStatusServlet</url-pattern>
+  </servlet-mapping>
 </web-app>

@@ -55,16 +55,38 @@
 
 	<section class="login_par">
 		<a href="/"><img width="100" src="img/icon/register.png" alt="" /></a>
-		<h2 style="color: red">Profile</h2>
-		<form class="login_inputs">
+		<h2 style="color: red">PROFILE</h2>
+		<%
+		if (session.getAttribute("registration_BAD") != null) {
+		%><p style="color: red"><%=session.getAttribute("registration_BAD")%></p>
+		<%
+		}
+		session.removeAttribute("registration_BAD");
+		%>
+		<%
+		if (session.getAttribute("registration_OK") != null) {
+		%><p style="color: green"><%=session.getAttribute("registration_OK")%></p>
+		<%
+		}
+		session.removeAttribute("registration_OK");
+		%>
+		<%
+		if (session.getAttribute("change_status_OK") != null) {
+		%><p style="color: green"><%=session.getAttribute("change_status_OK")%></p>
+		<%
+		}
+		session.removeAttribute("change_status_OK");
+		%>
+		<form class="login_inputs" action="UpdateProfileDetailServlet"
+			method="post">
 			<input disabled placeholder="Your Name" type="text" name="name"
 				id="name" /> <input placeholder="Your Email" type="email"
 				name="email" id="email" /> <input placeholder="Your Mobile"
 				type="tel" name="mobile" id="mobile" />
 			<div class="password_input">
 				<input placeholder="Your Password" type="password" name="password"
-					id="password" /> <img onclick="tgl()" id="eye_icon"
-					width="25" src="/img/icon/eye.png" alt="" />
+					id="password" /> <img onclick="tgl()" id="eye_icon" width="25"
+					src="img/icon/eye.png" alt="" />
 			</div>
 			<label for="group">Blood Group</label> <select disabled name="group"
 				id="group">
@@ -74,6 +96,16 @@
 				<option value="b_neg">B-</option>
 				<option value="ab_pos">AB+</option>
 				<option value="ab_neg">AB-</option>
+			</select> <label for="division">Division <span style='color: gray'>(<%=current_user.getDivision()%>)
+			</span></label> <select name="division" id="division" required>
+				<option selected="selected" value="">Choose One</option>
+			</select> <label for="district">District <span style='color: gray'>(<%=current_user.getDistrict()%>)
+			</span></label> <select name="district" id="district" required>
+				<option selected="selected" value="">Choose One</option>
+			</select> <label for="sub_district">Sub-District <span
+				style='color: gray'>(<%=current_user.getSub_district()%>)
+			</span></label> <select name="sub_district" id="sub_district" required><option
+					selected="selected" value="">Choose One</option>
 			</select>
 			<button id="login_btn">Update</button>
 		</form>
@@ -90,12 +122,78 @@
         if (password_input.type == "text") password_input.type = "password";
         else password_input.type = "text";
       };
-      
       document.getElementById('name').value='<%=current_user.getDonor_name()%>';
       document.getElementById('email').value='<%=current_user.getDonor_email()%>';
       document.getElementById('mobile').value='<%=current_user.getDonor_mobile()%>';
       document.getElementById('password').value='<%=current_user.getDonor_password()%>';
       document.getElementById('group').value='<%=current_user.getBloodgroup()%>';
+    </script>
+
+	<script>
+      var areas={}
+      var districts={}
+      let loc = async()=>{    	  
+      let division=[];
+      let district=[];
+      let selectedDivision;
+      await fetch('bd_areas.json').then(res=>res.json()).then(data=>areas=data);
+      division = Object.keys(areas);
+      for (var i = 0; i<division.length; i++){
+    	    var opt = document.createElement('option');
+    	    opt.value = division[i];
+    	    opt.innerHTML = division[i];
+    	    document.getElementById('division').appendChild(opt);
+    	}
+      document.getElementById('division').addEventListener('change',async(e)=> {
+    	districts=areas[e.target.value];
+      district = Object.keys(areas[e.target.value]);
+      document.getElementById('district').innerHTML='';
+      
+  	   var opt = document.createElement('option');
+  	   opt.innerHTML="Choose One";
+  	    opt.value = '';
+  	    document.getElementById('district').appendChild(opt);
+      for (var i = 0; i<district.length; i++){
+  	   	opt = document.createElement('option');
+  	    opt.value = district[i];
+  	    opt.innerHTML = district[i];
+  	    document.getElementById('district').appendChild(opt);
+  	} 
+      });
+      
+      document.getElementById('district').addEventListener('change',async(e)=> {
+          sub_district = (districts[e.target.value]);
+          document.getElementById('sub_district').innerHTML='';
+          for (var i = 0; i<sub_district.length; i++){
+      	    var opt = document.createElement('option');
+      	    opt.value = sub_district[i];
+      	    opt.innerHTML = sub_district[i];
+      	    document.getElementById('sub_district').appendChild(opt);
+      	} 
+          });
+      
+      }
+      loc();
+      
+      <%
+      if(current_user.getIsAvailabe()==1){%>
+      document.getElementById('available').checked=true;
+      <%}else{%>
+      document.getElementById('available').checked=false;
+      <%}%>
+      
+      document.getElementById('available').addEventListener('change',(e)=>{
+    	  if(e.target.checked===true){
+    		  let a = confirm('Are you want to set your status "available"?');
+    		  if(!a)e.target.checked=false;
+    		  else location='UpdateStatusServlet?available=1'
+    	  }else{
+    		  let a = confirm('Are you want to set your status "unavailable"?');    		  
+    		  if(!a)e.target.checked=true;
+    		  else location='UpdateStatusServlet?available=0'
+    	  }
+      })
+      
     </script>
 </body>
 </html>

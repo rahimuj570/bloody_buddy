@@ -14,15 +14,15 @@ import entities.Donor;
 import helper.ConnectionProvider;
 
 /**
- * Servlet implementation class RegisterServlet
+ * Servlet implementation class UpdateProfileDetailServlet
  */
-public class RegisterServlet extends HttpServlet {
+public class UpdateProfileDetailServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public RegisterServlet() {
+	public UpdateProfileDetailServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -47,25 +47,28 @@ public class RegisterServlet extends HttpServlet {
 			sc.setAttribute("registration_BAD", "Password length must be at least 6 characters!");
 			response.sendRedirect(request.getHeader("referer"));
 		} else {
+			Donor cu = (Donor) sc.getAttribute("current_user");
 			Donor donor = new Donor();
-			donor.setBloodgroup(group);
+			donor.setDonor_id(cu.getDonor_id());
+			donor.setBloodgroup(cu.getBloodgroup());
 			donor.setDonor_email(email);
 			donor.setDonor_mobile(mobile);
-			donor.setDonor_name(name);
+			donor.setDonor_name(cu.getDonor_name());
 			donor.setDonor_password(password);
 			donor.setIsAvailabe(1);
 			donor.setDistrict(district);
 			donor.setDivision(division);
 			donor.setSub_district(sub_district);
-//			System.out.println(donor);
-			int f = new DonorDao(new ConnectionProvider().main()).createDonor(donor);
-//			System.out.println(f);
+			System.out.println(donor);
+			int f = new DonorDao(new ConnectionProvider().main()).updateDonor(donor);
+			System.out.println(f);
 			if (f == 1062) {
 				sc.setAttribute("registration_BAD", "Email Already Registered!");
 				response.sendRedirect(request.getHeader("referer"));
 			} else if (f == 1) {
-				sc.setAttribute("registration_OK", "Registration Completed!");
-				response.sendRedirect(request.getContextPath() + "/login.jsp");
+				sc.setAttribute("current_user", donor);
+				sc.setAttribute("registration_OK", "Successfully Updated!");
+				response.sendRedirect(request.getHeader("referer"));
 			} else {
 				sc.setAttribute("registration_BAD", "Something Went Wrong!");
 				response.sendRedirect(request.getHeader("referer"));

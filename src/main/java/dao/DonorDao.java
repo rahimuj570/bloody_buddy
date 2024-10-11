@@ -54,6 +54,9 @@ public class DonorDao {
 				donor.setDonor_name(res.getString("donor_name"));
 				donor.setDonor_password(res.getString("donor_password"));
 				donor.setIsAvailabe(res.getInt("donor_isAvailable"));
+				donor.setDivision(res.getString(8));
+				donor.setDistrict(res.getString(9));
+				donor.setSub_district(res.getString(10));
 			} else {
 				return null;
 			}
@@ -88,5 +91,45 @@ public class DonorDao {
 			e.printStackTrace();
 		}
 		return d;
+	}
+
+	public int updateDonor(Donor donor) {
+		int f = 0;
+		String query = "update donor set donor_name=?, donor_email=?, donor_mobile=?, donor_password=?,donor_blood_group=?, donor_isAvailable=?,division=?,district=?,sub_district=? where donor_id="
+				+ donor.getDonor_id();
+		try {
+			PreparedStatement pst = con.prepareStatement(query);
+			pst.setString(1, donor.getDonor_name());
+			pst.setString(2, donor.getDonor_email());
+			pst.setString(3, donor.getDonor_mobile());
+			pst.setString(4, donor.getDonor_password());
+			pst.setString(5, donor.getBloodgroup());
+			pst.setInt(6, donor.getIsAvailabe());
+			pst.setString(7, donor.getDivision());
+			pst.setString(8, donor.getDistrict());
+			pst.setString(9, donor.getSub_district());
+			f = pst.executeUpdate();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			f = e.getErrorCode();
+			return f;
+		}
+		return f;
+	}
+	
+	public int updateStatus(int current_user_id, int status) {
+		int f=0;
+		String query = "update donor set donor_isAvailable=? where donor_id="+current_user_id;
+		try {
+			PreparedStatement pst = con.prepareStatement(query);
+			pst.setInt(1, status);
+			f = pst.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return f;
 	}
 }
