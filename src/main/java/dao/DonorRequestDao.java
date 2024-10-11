@@ -68,8 +68,9 @@ public class DonorRequestDao {
 	}
 
 	public ArrayList<DonorRequest> getRequestForHome(int page, int current_user_id) {
-		String query = "select * from donor_request where request_id not in(select request_id from interest where donor_id=?) and when_need>now() order by when_need asc limit 5 offset "
+		String query = "select * from donor_request where request_id not in(select request_id from interest where donor_id=?) and when_need>now() and created_by!="+current_user_id+" order by when_need asc limit 5 offset "
 				+ 5 * page;
+		
 		ArrayList<DonorRequest> allRequest = new ArrayList<DonorRequest>();
 		try {
 			PreparedStatement pst = con.prepareStatement(query);

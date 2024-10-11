@@ -127,11 +127,11 @@
 					href="CreateChatRoomServlet?receiver=<%=dReq.getCreated_by()%>">Message</a>
 			</div>
 		</section>
-		<button id="refresh" onclick="location.reload()">See All
-			Notifications</button>
 		<%
 		}
 		%>
+		<button id="refresh" onclick="location.reload()">See All
+			Notifications</button>
 		<%
 		}
 		if (reqList != null && unseenReqList.isEmpty()) {
