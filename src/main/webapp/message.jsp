@@ -1,3 +1,9 @@
+<%@page import="entities.Chats"%>
+<%@page import="dao.ChatsDao"%>
+<%@page import="dao.DonorDao"%>
+<%@page import="java.lang.reflect.Array"%>
+<%@page import="java.security.cert.CRL"%>
+<%@page import="entities.ChatRoom"%>
 <%@page import="dao.ChatRoomDao"%>
 <%@page import="dao.InterestDao"%>
 <%@page import="java.text.SimpleDateFormat"%>
@@ -13,7 +19,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bloody Buddy</title>
+<title>Message</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -27,15 +33,14 @@
 				<img style="width: 100%" src="logo.png" alt="" />
 			</div>
 			<ul class="menu_par">
+				<li><a href="<%=request.getContextPath()%>">Home</a></li>
+				<li><a href="/profile.html">Profile</a></li>
+				<li><a href="message.jsp">Message(10)</a></li>
 				<%
 				InterestDao intDao = new InterestDao(ConnectionProvider.main());
 				Donor current_user = (Donor) session.getAttribute("current_user");
 				int notification_count = intDao.countUnseenInterest(current_user.getDonor_id());
-				int message_count = new ChatRoomDao(ConnectionProvider.main()).getUnseenRoom(current_user.getDonor_id());
 				%>
-				<li><a href="<%=request.getContextPath()%>">Home</a></li>
-				<li><a href="profile.jsp">Profile</a></li>
-				<li><a href="message.jsp">Message<%=message_count > 0 ? "(" + message_count + ")" : ""%></a></li>
 				<li><a href="notification.jsp">Notification<%=notification_count > 0 ? "(" + notification_count + ")" : ""%></a></li>
 				<li><a href="">Buddies(10)</a></li>
 				<li><a href="create_request.jsp">Create Request</a></li>
@@ -54,84 +59,68 @@
 
 	<!-- NEWS FEED -->
 	<section class="news_par">
+
 		<p
-			style="text-align: center; font-size: 30px; font-weight: bold; margin: 30px; color: red;">FEED</p>
-		<%
-		if (session.getAttribute("interest_OK") != null) {
-		%><p style="color: green; margin: 20px; text-align: center;"><%=session.getAttribute("interest_OK")%></p>
-		<%
-		}
-		session.removeAttribute("interest_OK");
-		%>
+			style="text-align: center; font-size: 30px; font-weight: bold; margin: 30px; color: red;">MESSAGES</p>
+
 		<%
 		String p = request.getParameter("p");
 		if (p == null)
 			p = "0";
 		int pNum = Integer.parseInt(p);
-		DonorRequestDao drDao = new DonorRequestDao(ConnectionProvider.main());
-		ArrayList<DonorRequest> reqList = drDao.getRequestForHome(pNum, current_user.getDonor_id());
-		if (reqList != null) {
-			for (DonorRequest dReq : reqList) {
+
+		//////
+
+		ChatRoomDao crDao = new ChatRoomDao(ConnectionProvider.main());
+		DonorDao dDao = new DonorDao(ConnectionProvider.main());
+		ChatsDao cDao = new ChatsDao(ConnectionProvider.main());
+		ArrayList<ChatRoom> crList = crDao.getAllChatRoomByPersonId(current_user.getDonor_id(), pNum);
+		if (crList != null && !crList.isEmpty()) {
+			for (ChatRoom cr : crList) {
+
+				String per[] = cr.getPersons().split(",");
+				int receiver_id = Integer.parseInt(per[0]) == current_user.getDonor_id() ? Integer.parseInt(per[1])
+				: Integer.parseInt(per[0]);
+				Donor d = dDao.getDonorById(receiver_id);
+				Chats c = cDao.getLastChatByRoomId(cr.getRoom_id());
+
+				////////////
+
+				String pattern = "dd MMMM, yyyy";
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+				String date = simpleDateFormat.format(cr.getLast_update());
+				String pattern2 = "hh:mm a";
+				SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(pattern2);
+				String time = simpleDateFormat2.format(cr.getLast_update());
 		%>
-
-		<section class="news_card">
-			<div style="display: flex; align-items: center">
-				<img width="100" src="img/blood/<%=dReq.getBlood_group()%>.png"
-					alt="" />
-				<div class="card_details">
-					<p>
-						Patient Name:
-						<%=dReq.getPatient_name()%></p>
-					<p>
-						Need:
-						<%=dReq.getBlood_unit()%>
-						<%=dReq.getBlood_unit() < 2 ? "Unit" : "Units"%></p>
-					<p>
-						Location:
-						<%=dReq.getLocation()%></p>
-					<p>
-						Need For:
-						<%=dReq.getWhy_need()%></p>
-
-					<%
-					String pattern = "dd MMMM, yyyy";
-					SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-					String date = simpleDateFormat.format(dReq.getWhen_need());
-					String pattern2 = "hh:mm a";
-					SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat(pattern2);
-					String time = simpleDateFormat2.format(dReq.getWhen_need());
-					%>
-
-					<p>
-						Date:
-						<%=date%></p>
-					<p>
-						Time:
-						<%=time%></p>
-					<p>
-						Mobile:
-						<%=dReq.getMobile()%></p>
+		<a style="text-decoration: none; color: #000"
+			href="chat.jsp?room=<%=cr.getRoom_id()%>">
+			<section style="position: relative" class="news_card">
+				<div style="display: flex; align-items: center">
+					<img width="100" src="img/blood/<%=d.getBloodgroup()%>.png" alt="" />
+					<div class="card_details">
+						<strong><%=d.getDonor_name()%></strong>
+						<p><%=c.getChat_text().length() > 30 ? c.getChat_text().substring(0, 29) + " ..." : c.getChat_text()%></p>
+						<p style="font-size: 12px; padding-top: 10px; color: gray">
+							<%=date + " at " + time%></p>
+					</div>
 				</div>
-			</div>
-			<div class="news_action_btn">
-				<a id="donate_btn"
-					href="<%=request.getContextPath()%>/CreateInterestServlet?req=<%=dReq.getRequest_id()%>&auth=<%=dReq.getCreated_by()%>">Interest</a>
-				<a id="call_btn" href="tel:<%=dReq.getMobile()%>">Call</a> <a
-					id="msg_btn"
-					href="CreateChatRoomServlet?receiver=<%=dReq.getCreated_by()%>">Message</a>
-			</div>
-		</section>
+				<%
+				if (cr.getIs_seen() == 0) {
+				%>
+				<img style="position: absolute; right: 5px; top: 5px" width="20"
+					src="img/icon/unread.png" alt="" />
+				<%
+				}
+				%>
+			</section>
+		</a>
+
 		<%
 		}
-		} else {
-		%>
-		<section class="news_card">
-			<div style="display: flex; align-items: center">NO REQUEST
-				FOUND!</div>
-		</section>
-		<%
 		}
 		%>
+
 		<div class="page_par">
 			<%
 			if (p == null || p.equals("0")) {
@@ -143,7 +132,7 @@
 			<a id="prev_btn" href="?p=<%=pNum - 1%>">Previous</a>
 			<%
 			}
-			if (reqList.size() < 5) {
+			if (crList.size() < 10) {
 			%>
 			<button id="prev_btn" disabled="disabled" style="background: gray">Next</button>
 			<%

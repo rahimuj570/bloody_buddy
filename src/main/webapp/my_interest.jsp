@@ -1,19 +1,17 @@
-<%@page import="dao.ChatRoomDao"%>
 <%@page import="dao.InterestDao"%>
-<%@page import="java.text.SimpleDateFormat"%>
-<%@page import="helper.ConnectionProvider"%>
-<%@page import="entities.DonorRequest"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="dao.DonorRequestDao"%>
 <%@page import="entities.Donor"%>
+<%@page import="helper.ConnectionProvider"%>
+<%@page import="dao.DonorRequestDao"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="entities.DonorRequest"%>
+<%@page import="java.text.SimpleDateFormat"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bloody Buddy</title>
+<meta charset="ISO-8859-1">
+<title>My Interest</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -27,20 +25,13 @@
 				<img style="width: 100%" src="logo.png" alt="" />
 			</div>
 			<ul class="menu_par">
-				<%
-				InterestDao intDao = new InterestDao(ConnectionProvider.main());
-				Donor current_user = (Donor) session.getAttribute("current_user");
-				int notification_count = intDao.countUnseenInterest(current_user.getDonor_id());
-				int message_count = new ChatRoomDao(ConnectionProvider.main()).getUnseenRoom(current_user.getDonor_id());
-				%>
 				<li><a href="<%=request.getContextPath()%>">Home</a></li>
-				<li><a href="profile.jsp">Profile</a></li>
-				<li><a href="message.jsp">Message<%=message_count > 0 ? "(" + message_count + ")" : ""%></a></li>
-				<li><a href="notification.jsp">Notification<%=notification_count > 0 ? "(" + notification_count + ")" : ""%></a></li>
+				<li><a href="/profile.html">Profile</a></li>
+				<li><a href="/message.html">Message(10)</a></li>
+				<li><a href="">Notification(10)</a></li>
 				<li><a href="">Buddies(10)</a></li>
 				<li><a href="create_request.jsp">Create Request</a></li>
 				<li><a href="my_request.jsp">My Request</a></li>
-				<li><a href="my_interest.jsp">My Interest</a></li>
 				<li><a href="LogoutServlet">Logout</a></li>
 			</ul>
 		</div>
@@ -55,7 +46,8 @@
 	<!-- NEWS FEED -->
 	<section class="news_par">
 		<p
-			style="text-align: center; font-size: 30px; font-weight: bold; margin: 30px; color: red;">FEED</p>
+			style="text-align: center; font-size: 30px; font-weight: bold; margin: 30px; color: red;">MY
+			INTERESTS</p>
 		<%
 		if (session.getAttribute("interest_OK") != null) {
 		%><p style="color: green; margin: 20px; text-align: center;"><%=session.getAttribute("interest_OK")%></p>
@@ -64,16 +56,23 @@
 		session.removeAttribute("interest_OK");
 		%>
 		<%
+		if (session.getAttribute("delete_int_OK") != null) {
+		%><p style="color: green; margin: 20px; text-align: center;"><%=session.getAttribute("delete_int_OK")%></p>
+		<%
+		}
+		session.removeAttribute("delete_int_OK");
+		%>
+		<%
 		String p = request.getParameter("p");
 		if (p == null)
 			p = "0";
 		int pNum = Integer.parseInt(p);
-		DonorRequestDao drDao = new DonorRequestDao(ConnectionProvider.main());
-		ArrayList<DonorRequest> reqList = drDao.getRequestForHome(pNum, current_user.getDonor_id());
-		if (reqList != null) {
+		Donor current_user = (Donor) session.getAttribute("current_user");
+		InterestDao intDao = new InterestDao(ConnectionProvider.main());
+		ArrayList<DonorRequest> reqList = intDao.getInterestByDonorID(pNum, current_user.getDonor_id());
+		if (reqList != null && !reqList.isEmpty()) {
 			for (DonorRequest dReq : reqList) {
 		%>
-
 		<section class="news_card">
 			<div style="display: flex; align-items: center">
 				<img width="100" src="img/blood/<%=dReq.getBlood_group()%>.png"
@@ -115,7 +114,7 @@
 			</div>
 			<div class="news_action_btn">
 				<a id="donate_btn"
-					href="<%=request.getContextPath()%>/CreateInterestServlet?req=<%=dReq.getRequest_id()%>&auth=<%=dReq.getCreated_by()%>">Interest</a>
+					href="<%=request.getContextPath()%>/DeleteInterestServlet?req=<%=dReq.getRequest_id()%>&auth=<%=dReq.getCreated_by()%>">Remove</a>
 				<a id="call_btn" href="tel:<%=dReq.getMobile()%>">Call</a> <a
 					id="msg_btn"
 					href="CreateChatRoomServlet?receiver=<%=dReq.getCreated_by()%>">Message</a>
