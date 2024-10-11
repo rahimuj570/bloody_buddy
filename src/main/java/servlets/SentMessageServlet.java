@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+import dao.ChatRoomDao;
 import dao.ChatsDao;
 import entities.Donor;
 import helper.ConnectionProvider;
@@ -39,6 +40,7 @@ public class SentMessageServlet extends HttpServlet {
 		Donor cu = (Donor) sc.getAttribute("current_user");
 		ChatsDao cDao = new ChatsDao(ConnectionProvider.main());
 		int f = cDao.sentMessage(message, Integer.parseInt(room_id), cu.getDonor_id());
+		new ChatRoomDao(ConnectionProvider.main()).makePersonSeen(Integer.parseInt(room_id), cu.getDonor_id());
 		response.sendRedirect(request.getHeader("referer"));
 	}
 

@@ -49,7 +49,7 @@ public class InterestDao {
 	}
 
 	public ArrayList<DonorRequest> getInterestByDonorID(int page, int current_user_id) {
-		String query = "select * from donor_request where request_id in(select request_id from interest where donor_id=?) order by when_need asc limit 5 offset "
+		String query = "select * from donor_request where request_id in(select request_id from interest where donor_id=?) and when_need>now() order by when_need asc limit 5 offset "
 				+ 5 * page;
 		ArrayList<DonorRequest> allRequest = new ArrayList<DonorRequest>();
 		try {
@@ -108,7 +108,7 @@ public class InterestDao {
 
 	public ArrayList<DonorRequest> getUnseenInterestForNotification(int page, int current_user_id) {
 		String query = "select * from donor_request where created_by=" + current_user_id
-				+ " and created_by in (select author_id from interest where is_seen=0) and request_id in(select request_id from interest where is_seen=0) order by when_need asc";
+				+ " and created_by in (select author_id from interest where is_seen=0) and request_id in(select request_id from interest where is_seen=0) and when_need>now() order by when_need asc";
 		ArrayList<DonorRequest> allRequest = new ArrayList<DonorRequest>();
 		try {
 			PreparedStatement pst = con.prepareStatement(query);

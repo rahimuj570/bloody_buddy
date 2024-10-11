@@ -6,6 +6,14 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="dao.DonorRequestDao"%>
 <%@page import="entities.Donor"%>
+<%@page import="dao.ChatRoomDao"%>
+<%@page import="dao.InterestDao"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="helper.ConnectionProvider"%>
+<%@page import="entities.DonorRequest"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="dao.DonorRequestDao"%>
+<%@page import="entities.Donor"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -37,7 +45,7 @@
 				<li><a href="profile.jsp">Profile</a></li>
 				<li><a href="message.jsp">Message<%=message_count > 0 ? "(" + message_count + ")" : ""%></a></li>
 				<li><a href="notification.jsp">Notification<%=notification_count > 0 ? "(" + notification_count + ")" : ""%></a></li>
-				<li><a href="">Buddies(10)</a></li>
+				<li><a href="find_donor.jsp">Find Donor</a></li>
 				<li><a href="create_request.jsp">Create Request</a></li>
 				<li><a href="my_request.jsp">My Request</a></li>
 				<li><a href="my_interest.jsp">My Interest</a></li>

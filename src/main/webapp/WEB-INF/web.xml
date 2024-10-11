@@ -149,4 +149,34 @@
     <servlet-name>UpdateStatusServlet</servlet-name>
     <url-pattern>/UpdateStatusServlet</url-pattern>
   </servlet-mapping>
+  <filter>
+    <display-name>LogInFilter</display-name>
+    <filter-name>LogInFilter</filter-name>
+    <filter-class>helper.LogInFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>LogInFilter</filter-name>
+    <url-pattern>/LogInFilter</url-pattern>
+    <url-pattern>/index.jsp</url-pattern>
+    <url-pattern>/chat.jsp</url-pattern>
+    <url-pattern>/create_request.jsp</url-pattern>
+    <url-pattern>/find_donor.jsp</url-pattern>
+    <url-pattern>/message.jsp</url-pattern>
+    <url-pattern>/my_interest.jsp</url-pattern>
+    <url-pattern>/my_request.jsp</url-pattern>
+    <url-pattern>/notification.jsp</url-pattern>
+    <url-pattern>/profile.jsp</url-pattern>
+    <url-pattern>/update_request.jsp</url-pattern>
+    <url-pattern>/CreateCharRoomServlet</url-pattern>
+    <url-pattern>/CreateInterestServlet</url-pattern>
+    <url-pattern>/CreateRequestServlet</url-pattern>
+    <url-pattern>/DeleteInterestServlet</url-pattern>
+    <url-pattern>/DeleteRequestServlet</url-pattern>
+    <url-pattern>/SeenAllInterestServlet</url-pattern>
+    <url-pattern>/SeenChatRoomServlet</url-pattern>
+    <url-pattern>/SentMessageServlet</url-pattern>
+    <url-pattern>/UpdateProfileDetailServlet</url-pattern>
+    <url-pattern>/UpdateRequestServlet</url-pattern>
+    <url-pattern>/UpdateStatusServlet</url-pattern>
+  </filter-mapping>
 </web-app>

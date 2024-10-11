@@ -7,6 +7,15 @@ public class ChatRoom {
 	String persons;
 	int is_seen;
 	Date last_update;
+	String seen_by;
+
+	public String getSeen_by() {
+		return seen_by;
+	}
+
+	public void setSeen_by(String seen_by) {
+		this.seen_by = seen_by;
+	}
 
 	public Date getLast_update() {
 		return last_update;

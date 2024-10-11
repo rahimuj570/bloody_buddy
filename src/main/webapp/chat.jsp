@@ -11,6 +11,14 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="dao.DonorRequestDao"%>
 <%@page import="entities.Donor"%>
+<%@page import="dao.ChatRoomDao"%>
+<%@page import="dao.InterestDao"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="helper.ConnectionProvider"%>
+<%@page import="entities.DonorRequest"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="dao.DonorRequestDao"%>
+<%@page import="entities.Donor"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html>
@@ -18,30 +26,27 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Buddy namse</title>
+<title>Chat</title>
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-	<%
-	if (session.getAttribute("current_user") == null)
-		response.sendRedirect(request.getContextPath() + "/login.jsp");
-	%>
 	<section class="menu_sec">
 		<div class="logo_menu">
 			<div style="width: 50px">
 				<img style="width: 100%" src="logo.png" alt="" />
 			</div>
 			<ul class="menu_par">
-				<li><a href="<%=request.getContextPath()%>">Home</a></li>
-				<li><a href="/profile.html">Profile</a></li>
-				<li><a href="message.jsp">Message(10)</a></li>
 				<%
 				InterestDao intDao = new InterestDao(ConnectionProvider.main());
 				Donor current_user = (Donor) session.getAttribute("current_user");
 				int notification_count = intDao.countUnseenInterest(current_user.getDonor_id());
+				int message_count = new ChatRoomDao(ConnectionProvider.main()).getUnseenRoom(current_user.getDonor_id());
 				%>
+				<li><a href="<%=request.getContextPath()%>">Home</a></li>
+				<li><a href="profile.jsp">Profile</a></li>
+				<li><a href="message.jsp">Message<%=message_count > 0 ? "(" + message_count + ")" : ""%></a></li>
 				<li><a href="notification.jsp">Notification<%=notification_count > 0 ? "(" + notification_count + ")" : ""%></a></li>
-				<li><a href="">Buddies(10)</a></li>
+				<li><a href="find_donor.jsp">Find Donor</a></li>
 				<li><a href="create_request.jsp">Create Request</a></li>
 				<li><a href="my_request.jsp">My Request</a></li>
 				<li><a href="my_interest.jsp">My Interest</a></li>

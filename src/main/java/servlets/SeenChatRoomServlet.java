@@ -5,9 +5,12 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 
 import dao.ChatRoomDao;
+import entities.Donor;
 import helper.ConnectionProvider;
 
 /**
@@ -30,8 +33,10 @@ public class SeenChatRoomServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession sc= request.getSession();
+		Donor cu = (Donor)sc.getAttribute("current_user");
 		int room_id = Integer.parseInt(request.getParameter("room"));
-		new ChatRoomDao(ConnectionProvider.main()).seenChatRoom(room_id);
+		new ChatRoomDao(ConnectionProvider.main()).receiverSeen(room_id,cu.getDonor_id());
 	}
 
 	/**

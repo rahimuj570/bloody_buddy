@@ -89,11 +89,12 @@ public class ChatRoomDao {
 
 	public ArrayList<ChatRoom> getAllChatRoomByPersonId(int id, int pNum) {
 		ArrayList<ChatRoom> crList = new ArrayList<ChatRoom>();
-		String query = "select * from chat_room where persons in (?) order by last_update desc limit 10 offset "
-				+ 10 * pNum;
+		String query = "select * from chat_room where persons like '" + id + ",%' or persons like '%," + id
+				+ "' order by last_update desc limit 10 offset " + 10 * pNum;
 		try {
 			PreparedStatement pst = con.prepareStatement(query);
-			pst.setInt(1, id);
+//			pst.setInt(1, id);
+//			pst.setInt(2, id);
 			ResultSet res = pst.executeQuery();
 			while (res.next()) {
 				ChatRoom cr = new ChatRoom();
@@ -122,6 +123,7 @@ public class ChatRoomDao {
 				cr.setPersons(res.getString(2));
 				cr.setIs_seen(res.getInt(3));
 				cr.setLast_update(res.getTimestamp(4));
+				cr.setSeen_by(res.getString(5));
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -142,23 +144,50 @@ public class ChatRoomDao {
 		}
 	}
 
-	public void seenChatRoom(int room_id) {
-		String query = "update chat_room set is_seen=1 where room_id=" + room_id;
+	public boolean isISennChat(int room_id, int uid) {
+		String query = "select count(*) from chat_room where (seen_by like ('" + uid + ",%') or seen_by like ('%," + uid
+				+ "')or seen_by like ('%," + uid + ",')) and room_id=" + room_id;
 		try {
 			PreparedStatement pst = con.prepareStatement(query);
-			pst.executeUpdate();
+			ResultSet res = pst.executeQuery();
+			int count = 0;
+			if (res.next())
+				count = res.getInt(1);
+			if (count == 1)
+				return true;
+			else
+				return false;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
-	public int getUnseenRoom(int current_user_id) {
+	public void receiverSeen(int room_id, int uid) {
+		if (!isISennChat(room_id, uid)) {
+			ChatRoom cr = getChatRoomByRoomId(room_id);
+			if (cr.getSeen_by().isEmpty())
+				cr.setSeen_by("");
+			cr.setSeen_by(cr.getSeen_by() + uid + ",");
+			String query = "update chat_room set seen_by='" + cr.getSeen_by() + "' where room_id=" + room_id;
+			try {
+				PreparedStatement pst = con.prepareStatement(query);
+				pst.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public int getUnseenRoom(int cuid) {
 		int count = 0;
-		String query = "select count(*) from chat_room where persons in(?) and is_seen=0";
+		String query = "select count(*) from chat_room where (seen_by not like ('" + cuid
+				+ ",%') and seen_by not like ('%," + cuid + "') and seen_by not like ('%," + cuid
+				+ ",')) and (persons like ('%," + cuid + "') or persons like ('" + cuid + ",%'))";
 		try {
 			PreparedStatement pst = con.prepareStatement(query);
-			pst.setInt(1, current_user_id);
 			ResultSet res = pst.executeQuery();
 			if (res.next()) {
 				count = res.getInt(1);
@@ -168,5 +197,16 @@ public class ChatRoomDao {
 			e.printStackTrace();
 		}
 		return count;
+	}
+
+	public void makePersonSeen(int room_id, int person_id) {
+		String query = "update chat_room set seen_by='" + person_id + ",' where room_id=" + room_id;
+		try {
+			PreparedStatement pst = con.prepareStatement(query);
+			pst.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

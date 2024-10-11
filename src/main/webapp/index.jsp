@@ -37,7 +37,7 @@
 				<li><a href="profile.jsp">Profile</a></li>
 				<li><a href="message.jsp">Message<%=message_count > 0 ? "(" + message_count + ")" : ""%></a></li>
 				<li><a href="notification.jsp">Notification<%=notification_count > 0 ? "(" + notification_count + ")" : ""%></a></li>
-				<li><a href="">Buddies(10)</a></li>
+				<li><a href="find_donor.jsp">Find Donor</a></li>
 				<li><a href="create_request.jsp">Create Request</a></li>
 				<li><a href="my_request.jsp">My Request</a></li>
 				<li><a href="my_interest.jsp">My Interest</a></li>

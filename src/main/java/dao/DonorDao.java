@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import entities.Donor;
 
@@ -118,10 +119,10 @@ public class DonorDao {
 		}
 		return f;
 	}
-	
+
 	public int updateStatus(int current_user_id, int status) {
-		int f=0;
-		String query = "update donor set donor_isAvailable=? where donor_id="+current_user_id;
+		int f = 0;
+		String query = "update donor set donor_isAvailable=? where donor_id=" + current_user_id;
 		try {
 			PreparedStatement pst = con.prepareStatement(query);
 			pst.setInt(1, status);
@@ -131,5 +132,38 @@ public class DonorDao {
 			e.printStackTrace();
 		}
 		return f;
+	}
+
+	public ArrayList<Donor> findAvailableDonors(int current_user_id, String division, String district,
+			String sub_district, int pNum) {
+		ArrayList<Donor> dList = new ArrayList<Donor>();
+		String query = "select * from donor where donor_id!=" + current_user_id + " and donor_isAvailable=1";
+		if (!district.isEmpty() && !division.isEmpty() && !sub_district.isEmpty()) {
+			query = "select * from donor where donor_id!=" + current_user_id
+					+ " and donor_isAvailable=1 and division='"+division+"' and district='"+district+"' and sub_district='"+sub_district+"'";
+		}
+		query+=" limit 20 offset "+20*pNum;
+		try {
+			PreparedStatement pst = con.prepareStatement(query);
+			ResultSet res = pst.executeQuery();
+			while (res.next()) {
+				Donor d = new Donor();
+				d.setDonor_id(res.getInt(1));
+				d.setDonor_name(res.getString(2));
+				d.setDonor_email(res.getString(3));
+				d.setDonor_mobile(res.getString(4));
+				d.setDonor_password(res.getString(5));
+				d.setBloodgroup(res.getString(6));
+				d.setIsAvailabe(res.getInt(7));
+				d.setDivision(res.getString(8));
+				d.setDistrict(res.getString(9));
+				d.setSub_district(res.getString(10));
+				dList.add(d);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return dList;
 	}
 }
